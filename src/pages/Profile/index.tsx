@@ -142,16 +142,27 @@ const Profile: React.FC = () => {
           return;
         }
 
-        const data = new FormData();
+        const displaySize = {
+          width: 400,
+          height: response.width - response.height,
+        };
 
-        data.append('avatar', {
-          type: 'image/jpeg',
-          name: `${user.id}.jpg`,
-          uri: response.uri,
-        });
+        ImageEditor.cropImage(response.uri, {
+          offset: { x: 0, y: 0 },
+          size: { width: response.width, height: response.height },
+          displaySize,
+        }).then((url) => {
+          const data = new FormData();
 
-        api.patch('users/avatar', data).then((apiResponse) => {
-          updateUser(apiResponse.data);
+          data.append('avatar', {
+            type: 'image/jpeg',
+            name: `${user.id}.jpg`,
+            uri: url,
+          });
+
+          api.patch('users/avatar', data).then((apiResponse) => {
+            updateUser(apiResponse.data);
+          });
         });
       },
     );
